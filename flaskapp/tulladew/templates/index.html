@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tulladew</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+        }
+        .content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #002400;
+            border-radius: 4px;
+            box-shadow: 0px 2px 4px -1px rgba(0,0,0,0.2),
+                        0px 4px 5px 0px rgba(0,0,0,0.14), 
+                        0px 1px 10px 0px rgba(0,0,0,0.12);
+        }
+        h1, pre {
+            color: #008c00;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h1>Welcome!</h1>
+        {% for key, value in data.items() %}
+            <pre>{{ key }}: {{ value }}</pre>
+        {% endfor %}
+        <img src="https://media.tenor.com/CHc0B6gKHqUAAAAi/deadserver.gif">
+    </div>
+</body>
+</html>
