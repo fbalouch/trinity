@@ -7,7 +7,7 @@ app = Flask(__name__)
 @app.route('/')
 def IMDSv2():
     """
-    Access AWS Instance Metadata Service v2. 
+    Access AWS Instance Metadata Service v2. # https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html
     Renders a Flask HTTP response based on a jinja2 template, containing incoming request and IMDSv2 query data.
     """
 
