@@ -78,43 +78,63 @@
   become: yes
   gather_facts: yes
   tasks:
-    - name: Install docker
+    - name: Install Docker
       yum:
         name: docker
         state: latest
       become: true
 
-    - name: Start docker
+    - name: Start and enable Docker
       service:
         name: docker
         state: started
         enabled: yes
       become: true
 
-    - name: Add ec2-user to docker group
+    - name: Add ec2-user to Docker group
       user:
         name: ec2-user
         groups: docker
         append: yes
       become: true
 
-    - name: Copy files to remote host
+    - name: Copy Flask app
       copy:
-        src: "../{{ item }}"
-        dest: "/tmp/{{ item }}"
-      loop:
-        - docker-compose-tulladew.yml
-        - Dockerfile
-        - systemd-tulladew.service
-
-    - name: Build docker image
-      command:
-        cmd: docker build -t tulladew -f /remote/path/to/files/Dockerfile .
-        chdir: /remote/path/to/files
+        src: ../flaskapp/tulladew
+        dest: /tmp
       become: true
 
-    - name: Run docker-compose
+    - name: Copy Dockerfile
+      copy:
+        src: Dockerfile
+        dest: "/tmp/Dockerfile"
+      become: true 
+
+    - name: Build Tulladew Docker image
       command:
-        cmd: docker-compose up -d
-        chdir: /remote/path/to/files
+        cmd: docker build . -t tulladew:v1.0
+        chdir: /tmp
+      become: true
+
+    - name: Install Systemd service
+      copy:
+        src: docker-tulladew.service
+        dest: /etc/systemd/system/
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Reload Systemd
+      become: true
+
+    - name: Start and enable Tulladew
+      service:
+        name: docker-tulladew
+        state: started
+        enabled: yes
+      become: true
+
+  handlers:
+    - name: Reload Systemd
+      systemd:
+        daemon_reload: yes
       become: true
