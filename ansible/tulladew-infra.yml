@@ -1,0 +1,120 @@
+---
+- hosts: localhost
+  gather_facts: true
+  vars:
+    instanceType: t2.micro
+    region: us-east-1
+    ami: ami-0889a44b331db0194
+    keyName: tulladewKey
+
+  tasks:
+    - name: Check if private key file exists
+      stat:
+        path: "~/.ssh/{{ keyName }}.pem"
+      register: sshkey
+
+    - name: Create key pair
+      amazon.aws.ec2_key:
+        name: "{{ keyName }}"
+        region: "{{ region }}"
+      register: tulladewKey
+      when: not sshkey.stat.exists
+
+    - name: Save private key
+      copy:
+        content: "{{ tulladewKey.key.private_key }}"
+        dest: "~/.ssh/{{ keyName }}.pem"
+        mode: 0400
+      when: not sshkey.stat.exists
+
+    - name: Create security group
+      amazon.aws.ec2_group:
+        name: tulladewSG
+        description: Security group for Tulladew EC2 instance
+        region: "{{ region }}"
+        rules:
+          - proto: tcp
+            ports:
+              - 22
+            cidr_ip: 0.0.0.0/0
+        rules_egress:
+          - proto: all
+            cidr_ip: 0.0.0.0/0
+      register: tulladewSG
+
+    - name: Launch instance
+      amazon.aws.ec2_instance:
+        region: "{{ region }}"
+        instance_type: "{{ instanceType }}"
+        image_id: "{{ ami }}"
+        wait: true
+        security_group: "{{ tulladewSG.group_id }}"
+        tags:
+          Name: Ansible Tulladew
+          EnvName: Test Environment
+        key_name: "{{ keyName }}"
+      register: tulladewEC2
+
+    - name: Wait for SSH to come up
+      wait_for:
+        host: "{{ item.public_dns_name }}"
+        port: 22
+        delay: 15
+        timeout: 120
+        state: started
+      loop: "{{ tulladewEC2.instances }}"
+
+    - name: Add all instance public DNS to host group
+      add_host:
+        hostname: "{{ item.public_dns_name }}"
+        groups: ec2hosts
+      loop: "{{ tulladewEC2.instances }}"
+
+- hosts: ec2hosts
+  user: ec2-user
+  vars:
+    keyName: tulladewKey
+    ansible_private_key_file: "~/.ssh/{{ keyName }}.pem"
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install docker
+      yum:
+        name: docker
+        state: latest
+      become: true
+
+    - name: Start docker
+      service:
+        name: docker
+        state: started
+        enabled: yes
+      become: true
+
+    - name: Add ec2-user to docker group
+      user:
+        name: ec2-user
+        groups: docker
+        append: yes
+      become: true
+
+    - name: Copy files to remote host
+      copy:
+        src: "../{{ item }}"
+        dest: "/tmp/{{ item }}"
+      loop:
+        - docker-compose-tulladew.yml
+        - Dockerfile
+        - systemd-tulladew.service
+
+    - name: Build docker image
+      command:
+        cmd: docker build -t tulladew -f /remote/path/to/files/Dockerfile .
+        chdir: /remote/path/to/files
+      become: true
+
+    - name: Run docker-compose
+      command:
+        cmd: docker-compose up -d
+        chdir: /remote/path/to/files
+      become: true
