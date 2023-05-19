@@ -6,9 +6,9 @@
       - [App Request Sequence Diagram](#app-request-sequence-diagram)
       - [Infrastructure Diagram](#infrastructure-diagram)
   - [Ansible](#ansible)
-    - [How to Deploy using Ansible](#how-to-deploy-using-ansible)
+    - [How to Deploy with Ansible](#how-to-deploy-with-ansible)
   - [Terraform](#terraform)
-    - [How to Deploy using Terraform](#how-to-deploy-using-terraform)
+    - [How to Deploy with Terraform](#how-to-deploy-with-terraform)
   - [Summary](#summary)
 
 ## Overview
@@ -34,7 +34,7 @@ Ansible uses the concept of a 'playbook' to define procedural tasks that are run
 | 2. Agentless - There's no need to install additional software or agents on the managed nodes. | 2. Scalability - While Ansible can be used for large deployments, it may not scale as efficiently as Terraform. |
 | 3. Configuration Management - Ansible excels at configuration management tasks. | 3. Infrastructure management - Not as good when compared with Terraform |
 
-### How to Deploy using Ansible
+### How to Deploy with Ansible
 1. Install Ansible
 2. Install and configure AWS client with a set of credentials
 3. (Optional) Edit security group rules
@@ -46,7 +46,7 @@ Ansible uses the concept of a 'playbook' to define procedural tasks that are run
 ## Terraform
 Terraform uses a declarative approach to describe infrastructure using high-level configuration syntax in 'configuration files'. Different entities such as operating systems, applications, and cloud infrastructures have provider-specific resources that dictate how infrastructure is provisioned. For AWS EC2, Terraform requires an existing SSH key pair because the aws_key_pair resource does not support creating new ones. This require manual step to create key pair first. The 'Tulladew-infra' role uses the AWS provider to upload the key, create a security group that permits SSH and HTTP traffic, and then launches a t2.micro instance.
 
-Terraform has a 'remote-exec' provisioner, similar to Ansible, uses SSH to connect to a remote host and execute shell commands. However, it's not recommended for application configuration management, as it's primarily designed for executing simple, one-line commands to bootstrap clusters or other orchestrators. An alternative is to use cloud-init, which is what the 'Tulladew-infra' role uses. It passes the 'user-data.sh' script to the instance using EC2 user_data, a workaround that doesn't scale well with complex apps but works for this simple app and dev environment. The script manages the installation of Docker, building of the 'Tulladew' image, and its deployment. However, this method requires a significant effort and isn't the best approach as it requires embedding app artifacts in the shell script. Additionally, the user_data has a size limitation of 16KB. Any script exceeding this limit would require an external storage solution, like S3, adding more complexity.
+Terraform has a 'remote-exec' provisioner, similar to Ansible, which uses SSH to connect to remote hosts and execute shell commands. However, it's not recommended for application configuration management, as it's primarily designed for executing simple, one-line commands to bootstrap clusters or other orchestrators. An alternative is to use cloud-init, which is what the 'Tulladew-infra' role uses. It passes the 'user-data.sh' script to the instance using EC2 user_data, a workaround that doesn't scale well with complex apps but works for this simple app and dev environment. The script manages the installation of Docker, building of the 'Tulladew' image, and its deployment. However, this method requires a significant effort and isn't the best approach as it requires embedding app artifacts in the shell script. Additionally, the user_data has a size limitation of 16KB. Any script exceeding this limit would require an external storage solution, like S3, increasing complexity.
 
 | Pros | Cons |
 | --- | --- |
@@ -54,7 +54,7 @@ Terraform has a 'remote-exec' provisioner, similar to Ansible, uses SSH to conne
 | 2. Provider agnostic - Terraform supports a multitude of providers, so it can manage a diverse range of infrastructures. | 2. No configuration management - Terraform lacks built-in configuration management features and needs to be integrated with other tools or scripting.|
 | 3. Immutable Infrastructure - It adheres to the concept of immutable infrastructure. | 3. State file management - The state file must be managed carefully, especially when used in a team. |
 
-### How to Deploy using Terraform
+### How to Deploy with Terraform
 1. Install Terraform
 2. Install and configure AWS client with a set of credentials
 3. (Optional) Edit security group rules
