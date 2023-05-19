@@ -30,7 +30,7 @@
     - name: Create security group
       amazon.aws.ec2_group:
         name: tulladewSG
-        description: Security group for Tulladew EC2 instance
+        description: Security group for Tulladew EC2 instance via Ansible
         region: "{{ region }}"
         rules:
           - proto: tcp
@@ -39,7 +39,13 @@
               - 80
             cidr_ip: 0.0.0.0/0
         rules_egress:
-          - proto: all
+          - proto: tcp
+            from_port: 80
+            to_port: 80
+            cidr_ip: 0.0.0.0/0
+          - proto: tcp
+            from_port: 443
+            to_port: 443
             cidr_ip: 0.0.0.0/0
       register: tulladewSG
 
