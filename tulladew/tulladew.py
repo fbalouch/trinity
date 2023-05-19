@@ -12,7 +12,7 @@ def IMDSv2():
     """
 
     # Build http client 
-    conn = http.client.HTTPConnection("169.254.169.254")
+    conn = http.client.HTTPConnection('169.254.169.254')
 
     # Define request headers, set token ttl
     headers = {
@@ -20,10 +20,10 @@ def IMDSv2():
     }
 
     # First request to get the token
-    conn.request("PUT", "/latest/api/token", headers=headers)
+    conn.request('PUT', '/latest/api/token', headers=headers)
     res = conn.getresponse()
     data = res.read()
-    token = data.decode("utf-8")
+    token = data.decode('utf-8')
 
     # Define headers, use received token
     headers = {
@@ -34,9 +34,9 @@ def IMDSv2():
     urls = ['instance-id', 'instance-life-cycle', 'instance-type', 'local-hostname', 'local-ipv4', 'public-hostname', 'public-ipv4', 'security-groups']
     data = {}
     for url in urls:
-        conn.request("GET", "/latest/meta-data/%s" % url, headers=headers)
+        conn.request('GET', '/latest/meta-data/%s' % url, headers=headers)
         res = conn.getresponse()
-        data[url] = res.read().decode("utf-8")
+        data[url] = res.read().decode('utf-8')
     conn.close()
 
     # Add info from incoming request

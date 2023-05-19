@@ -101,31 +101,30 @@
 
     - name: Copy Flask app
       copy:
-        src: ../flaskapp/tulladew
+        src: ../tulladew
         dest: /tmp
       become: true
-
-    - name: Copy Dockerfile
-      copy:
-        src: Dockerfile
-        dest: "/tmp/Dockerfile"
-      become: true 
 
     - name: Build Tulladew Docker image
       command:
         cmd: docker build . -t tulladew:v1.0
-        chdir: /tmp
+        chdir: /tmp/tulladew
       become: true
 
-    - name: Install Systemd service
-      copy:
-        src: docker-tulladew.service
-        dest: /etc/systemd/system/
+    - name: Move Systemd service
+      command:
+        cmd: mv docker-tulladew.service /etc/systemd/system/docker-tulladew.service
+        chdir: /tmp/tulladew
+      become: true
+
+    - name: Set correct file permissions
+      file:
+        path: /etc/systemd/system/docker-tulladew.service
         owner: root
         group: root
         mode: '0644'
-      notify: Reload Systemd
       become: true
+      notify: Reload Systemd
 
     - name: Start and enable Tulladew
       service:

@@ -13,7 +13,7 @@ RUN /venv/bin/pip install flask jinja2 gunicorn
 # Copy the virtualenv into a distroless image
 FROM gcr.io/distroless/python3-debian11
 COPY --from=build-venv /venv /venv
-COPY tulladew /tulladew
+COPY . /tulladew
 WORKDIR /tulladew
 
 # Expose on port 5000
