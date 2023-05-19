@@ -1,0 +1,14 @@
+@startuml
+Tulladew -> HttpClient: Build Connection to AWS IMDSv2
+HttpClient -> IMDSv2: HTTP PUT /latest/api/token
+IMDSv2 --> HttpClient: Response (Token)
+Tulladew -> HttpClient: Define Headers with Token
+Tulladew -> HttpClient: Define URLs to Query
+HttpClient -> IMDSv2: HTTP GET /latest/meta-data/{url}
+IMDSv2 --> HttpClient: Response (Instance Metadata)
+HttpClient -> IMDSv2: Close Connection
+Tulladew -> FlaskRequest: Get User-Agent and IP
+FlaskRequest --> Tulladew: User-Agent and IP
+Tulladew -> Jinja2Template: Render Template with Data
+Jinja2Template --> Tulladew: Return HTML
+@enduml
