@@ -16,7 +16,7 @@ variable "ami" {
 
 variable "key_name" {
   description = "Key Pair Name"
-  default     = "tulladewKeyTerraform"
+  default     = "tulladewKey"
 }
 
 # Provider
@@ -24,13 +24,13 @@ provider "aws" {
   region = var.region
 }
 
-# Key Pair
+# Existing SSH Key Pair
 resource "aws_key_pair" "tulladew_key" {
   key_name   = var.key_name
   public_key = file("~/.ssh/${var.key_name}.pem.pub")
 }
 
-# Security Group
+# Create Security Group
 resource "aws_security_group" "tulladew_sg" {
   name        = "tulladewSG"
   description = "Security group for Tulladew EC2 instance via Terraform"
@@ -64,7 +64,7 @@ resource "aws_security_group" "tulladew_sg" {
   }
 }
 
-# EC2 Instance
+# Launch EC2 Instance w/ user data script
 resource "aws_instance" "tulladew_ec2" {
   ami           = var.ami
   instance_type = var.instance_type
