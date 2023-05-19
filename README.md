@@ -17,14 +17,13 @@ Ansible and Terraform are both DevOps tools that facilitate efficient management
 ![arch](ansible-vs-terraform.png)
 
 ## Tulladew (Flask App)
-Tulladew is a containerized Flask app. It uses the native Python HTTP client to get instance metadata from EC2 [Instance Metadata Service v2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html). Additional request information (incoming user-agent and remote IP) is retrieved from the Flask request. Jinja2 template is used to build and return HTML. Gunicorn is used as the Python Web Server Gateway Interface, without a reverse proxy. For production, consider using nginx or a cloud load balancer.
+'Tulladew' is a containerized Flask app. It uses the native Python HTTP client to get instance metadata from EC2 [Instance Metadata Service v2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html). Additional request information (incoming user-agent and remote IP) is retrieved from the Flask request. Jinja2 template is used to build and return HTML. Gunicorn is used as the Python Web Server Gateway Interface, without a reverse proxy. For production, consider using nginx or a cloud load balancer. The Docker image is built using [Google Distroless Container Tools](https://github.com/GoogleContainerTools/distroless).
 
 #### App Request Sequence Diagram
 ![arch](tulladew.puml.png)
 
 #### Infrastructure Diagram
 ![arch](tulladew.png)
-
 
 ## Ansible
 Ansible uses the concept of a 'playbook' to define procedural tasks that are run against a set of hosts. Different operating systems, applications, and cloud infrastructure providers have their own modules that define the tasks. The 'Tulladew-infra' playbook, uses the Amazon EC2 module to create a security group that permits SSH and HTTP. If no existing SSH key is found, it creates a new one, then proceeds to launch a t2.micro instance. Once the instance is running, Ansible connects to the remote host via SSH and configures Docker. It then builds the 'Tulladew' image and installs it.
