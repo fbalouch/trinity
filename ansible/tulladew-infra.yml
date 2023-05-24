@@ -86,7 +86,7 @@
   gather_facts: yes
   tasks:
     - name: Install Docker
-      yum:
+      dnf:
         name: docker
         state: latest
       become: true
