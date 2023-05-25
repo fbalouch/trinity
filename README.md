@@ -17,7 +17,7 @@ Ansible and Terraform are both DevOps tools that facilitate efficient management
 ![arch](ansible-vs-terraform.png)
 
 ## Tulladew (Flask App)
-'Tulladew' is a the containerized Flask app. It uses the native Python HTTP client to get instance metadata from EC2 [Instance Metadata Service v2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html), the new default on Amazon Linux 2023. Additional request information (incoming user-agent and remote IP) is retrieved from the Flask request. Jinja2 template is used to build and return HTML. Gunicorn is used as the Python Web Server Gateway Interface, without a reverse proxy. For production, consider using nginx or a cloud load balancer. The Docker image is built using [Google Distroless Container Tools](https://github.com/GoogleContainerTools/distroless).
+'Tulladew' is the containerized Flask app. It uses the native Python HTTP client to get instance metadata from EC2 [Instance Metadata Service v2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html), the new default on Amazon Linux 2023. Additional request information (incoming user-agent and remote IP) is retrieved from the Flask request. Jinja2 template is used to build and return HTML. Gunicorn is used as the Python Web Server Gateway Interface, without a reverse proxy. For production, consider using nginx or a cloud load balancer. The Docker image is built using [Google Distroless Container Tools](https://github.com/GoogleContainerTools/distroless).
 
 #### App Request Sequence Diagram
 ![arch](tulladew.puml.png)
